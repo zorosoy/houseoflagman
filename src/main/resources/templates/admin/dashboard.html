@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | House of Lagman</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body class="admin-body">
+<div class="admin-wrapper">
+    <nav class="admin-nav">
+        <span class="admin-nav__logo">House of Lagman – Admin</span>
+        <form th:action="@{/admin/logout}" method="post">
+            <button type="submit" class="btn btn--outline" style="color:white; border-color:white;">Abmelden</button>
+        </form>    </nav>
+
+    <div class="admin-content">
+
+        <section class="admin-section">
+            <h2>Reservationen</h2>
+
+            <div class="admin-tabs">
+                <button class="admin-tab" id="tab-btn-today" onclick="switchTab('today')">
+                    Heute
+                    <span class="admin-tab__date" id="todayDate"></span>
+                </button>
+                <button class="admin-tab" id="tab-btn-upcoming" onclick="switchTab('upcoming')">Kommende</button>
+                <button class="admin-tab" id="tab-btn-past" onclick="switchTab('past')">Vergangene</button>
+            </div>
+
+            <div class="admin-filter">
+                <input type="text" id="searchInput" placeholder="Nach Name suchen..." oninput="filterTable()">
+                <input type="date" id="dateFilter" onchange="filterTable()">
+                <button onclick="clearFilter()" class="admin-btn">Filter zurücksetzen</button>
+            </div>
+
+            <!-- HEUTE -->
+            <div class="admin-table-wrapper" id="tab-today" style="display:none">
+                <table class="admin-table" id="table-today">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable('table-today', 0)">Zeit ↕</th>
+                        <th onclick="sortTable('table-today', 1)">Name ↕</th>
+                        <th onclick="sortTable('table-today', 2)">Personen ↕</th>
+                        <th onclick="sortTable('table-today', 3)">E-Mail ↕</th>
+                        <th onclick="sortTable('table-today', 4)">Telefon ↕</th>
+                        <th onclick="sortTable('table-today', 5)">Status ↕</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${todayReservations}"
+                        th:attr="data-name=${r.name}, data-date=${r.date}"
+                        th:classappend="${r.status.name() == 'ARRIVED'} ? 'row-arrived' : (${r.status.name() == 'NO_SHOW'} ? 'row-noshow' : '')">
+                        <td th:text="${r.time}"></td>
+                        <td th:text="${r.name}"></td>
+                        <td th:text="${r.persons}"></td>
+                        <td th:text="${r.email}"></td>
+                        <td th:text="${r.phone}"></td>
+                        <td>
+                            <form th:action="@{/admin/reservations/{id}/status(id=${r.id})}" method="post">
+                                <input type="hidden" name="tab" value="today">
+                                <select name="status" onchange="this.form.submit()" class="admin-status-select">
+                                    <option value="PENDING" th:selected="${r.status.name() == 'PENDING'}">Ausstehend</option>
+                                    <option value="ARRIVED" th:selected="${r.status.name() == 'ARRIVED'}">Eingecheckt</option>
+                                    <option value="NO_SHOW" th:selected="${r.status.name() == 'NO_SHOW'}">Nicht erschienen</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/reservations/{id}/delete(id=${r.id})}" method="post">
+                                <input type="hidden" name="tab" value="today">
+                                <button type="submit" class="admin-btn admin-btn--delete">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(todayReservations)}" class="empty-row">
+                        <td colspan="7" style="text-align:center; color:#999;">Keine Reservationen heute</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- KOMMENDE -->
+            <div class="admin-table-wrapper" id="tab-upcoming" style="display:none">
+                <table class="admin-table" id="table-upcoming">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable('table-upcoming', 0)">Datum ↕</th>
+                        <th onclick="sortTable('table-upcoming', 1)">Zeit ↕</th>
+                        <th onclick="sortTable('table-upcoming', 2)">Name ↕</th>
+                        <th onclick="sortTable('table-upcoming', 3)">Personen ↕</th>
+                        <th onclick="sortTable('table-upcoming', 4)">E-Mail ↕</th>
+                        <th onclick="sortTable('table-upcoming', 5)">Telefon ↕</th>
+                        <th onclick="sortTable('table-upcoming', 6)">Status ↕</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${reservations}"
+                        th:attr="data-name=${r.name}, data-date=${r.date}"
+                        th:classappend="${r.status.name() == 'ARRIVED'} ? 'row-arrived' : (${r.status.name() == 'NO_SHOW'} ? 'row-noshow' : '')">
+                        <td th:text="${#temporals.format(r.date, 'dd.MM.yyyy')}"></td>
+                        <td th:text="${r.time}"></td>
+                        <td th:text="${r.name}"></td>
+                        <td th:text="${r.persons}"></td>
+                        <td th:text="${r.email}"></td>
+                        <td th:text="${r.phone}"></td>
+                        <td>
+                            <form th:action="@{/admin/reservations/{id}/status(id=${r.id})}" method="post">
+                                <input type="hidden" name="tab" value="upcoming">
+                                <select name="status" onchange="this.form.submit()" class="admin-status-select">
+                                    <option value="PENDING" th:selected="${r.status.name() == 'PENDING'}">Ausstehend</option>
+                                    <option value="ARRIVED" th:selected="${r.status.name() == 'ARRIVED'}">Eingecheckt</option>
+                                    <option value="NO_SHOW" th:selected="${r.status.name() == 'NO_SHOW'}">Nicht erschienen</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/reservations/{id}/delete(id=${r.id})}" method="post">
+                                <input type="hidden" name="tab" value="upcoming">
+                                <button type="submit" class="admin-btn admin-btn--delete">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(reservations)}" class="empty-row">
+                        <td colspan="8" style="text-align:center; color:#999;">Keine kommenden Reservationen</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- VERGANGENE -->
+            <div class="admin-table-wrapper" id="tab-past" style="display:none">
+                <table class="admin-table" id="table-past">
+                    <thead>
+                    <tr>
+                        <th onclick="sortTable('table-past', 0)">Datum ↕</th>
+                        <th onclick="sortTable('table-past', 1)">Zeit ↕</th>
+                        <th onclick="sortTable('table-past', 2)">Name ↕</th>
+                        <th onclick="sortTable('table-past', 3)">Personen ↕</th>
+                        <th onclick="sortTable('table-past', 4)">E-Mail ↕</th>
+                        <th onclick="sortTable('table-past', 5)">Telefon ↕</th>
+                        <th onclick="sortTable('table-past', 6)">Status ↕</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${pastReservations}"
+                        th:attr="data-name=${r.name}, data-date=${r.date}"
+                        th:classappend="${r.status.name() == 'ARRIVED'} ? 'row-arrived' : (${r.status.name() == 'NO_SHOW'} ? 'row-noshow' : '')">
+                        <td th:text="${#temporals.format(r.date, 'dd.MM.yyyy')}"></td>                        <td th:text="${r.time}"></td>
+                        <td th:text="${r.name}"></td>
+                        <td th:text="${r.persons}"></td>
+                        <td th:text="${r.email}"></td>
+                        <td th:text="${r.phone}"></td>
+                        <td>
+                            <span th:if="${r.status.name() == 'ARRIVED'}" class="status-arrived">Eingecheckt</span>
+                            <span th:if="${r.status.name() == 'NO_SHOW'}" class="status-noshow">Nicht erschienen</span>
+                            <span th:if="${r.status.name() == 'PENDING'}" class="status-pending">Ausstehend</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/reservations/{id}/delete(id=${r.id})}" method="post">
+                                <input type="hidden" name="tab" value="past">
+                                <button type="submit" class="admin-btn admin-btn--delete">Löschen</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(pastReservations)}" class="empty-row">
+                        <td colspan="8" style="text-align:center; color:#999;">Keine vergangenen Reservationen</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SONDERÖFFNUNGSZEITEN LISTE -->
+        <section class="admin-section">
+            <h2>Sonderöffnungszeiten</h2>
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Beschreibung</th>
+                    <th>Status</th>
+                    <th>Öffnung</th>
+                    <th>Schliessung</th>
+                    <th>Aktion</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sh : ${specialHours}">
+                    <td>
+                        <span th:if="${sh.dateTo != null}">
+                            <span th:if="${sh.date.month == sh.dateTo.month and sh.date.year == sh.dateTo.year}"
+                                  th:text="${#temporals.format(sh.date, 'dd.')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                            <span th:if="${sh.date.month != sh.dateTo.month and sh.date.year == sh.dateTo.year}"
+                                  th:text="${#temporals.format(sh.date, 'dd.MM.')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                            <span th:if="${sh.date.year != sh.dateTo.year}"
+                                  th:text="${#temporals.format(sh.date, 'dd.MM.yyyy')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                        </span>
+                        <span th:if="${sh.dateTo == null}"
+                              th:text="${#temporals.format(sh.date, 'dd.MM.yyyy')}"></span>
+                    </td>
+                    <td th:text="${sh.description}"></td>
+                    <td th:text="${sh.closed} ? 'Geschlossen' : 'Geöffnet'"></td>
+                    <td th:text="${sh.openTime} ?: '-'"></td>
+                    <td th:text="${sh.closeTime} ?: '-'"></td>
+                    <td>
+                        <form th:action="@{/admin/special-hours/{id}/delete(id=${sh.id})}" method="post">
+                            <button type="submit" class="admin-btn admin-btn--delete">Löschen</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(specialHours)}">
+                    <td colspan="6" style="text-align:center; color:#999;">Keine Sonderöffnungszeiten vorhanden</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SONDERÖFFNUNGSZEITEN FORMULAR -->
+        <section class="admin-section">
+            <h3>Neue Sonderöffnungszeit hinzufügen</h3>            <form th:action="@{/admin/special-hours/add}" method="post" onsubmit="return validateForm()">
+                <div class="admin-form__row">
+                    <div class="form-group">
+                        <label>Datum von</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Datum bis (optional)</label>
+                        <input type="date" name="dateTo">
+                    </div>
+                    <div class="form-group">
+                        <label>Beschreibung</label>
+                        <input type="text" name="description" placeholder="z.B. Silvester">
+                    </div>
+                    <div class="form-group">
+                        <label>Geschlossen?</label>
+                        <select name="closed" id="closedSelect">
+                            <option value="true">Ja – geschlossen</option>
+                            <option value="false">Nein – geöffnet</option>
+                        </select>
+                    </div>
+                    <div class="form-group time-field">
+                        <label>Öffnungszeit</label>
+                        <input type="time" name="openTime">
+                    </div>
+                    <div class="form-group time-field">
+                        <label>Schliessungszeit</label>
+                        <input type="time" name="closeTime">
+                    </div>
+                    <button type="submit" class="btn btn--primary">Hinzufügen</button>
+                </div>
+            </form>
+        </section>
+
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const todayDate = new Date();
+    document.getElementById('todayDate').textContent =
+        todayDate.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    const activeTab = /*[[${activeTab}]]*/ 'today';
+    let currentTab = activeTab;
+
+    function switchTab(tab) {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-today').style.display = 'none';
+        document.getElementById('tab-upcoming').style.display = 'none';
+        document.getElementById('tab-past').style.display = 'none';
+        document.getElementById('tab-' + tab).style.display = 'block';
+        document.getElementById('tab-btn-' + tab).classList.add('active');
+        currentTab = tab;
+        // Datumsfilter nur bei upcoming/past zeigen
+        document.getElementById('dateFilter').style.display = tab === 'today' ? 'none' : 'block';
+        clearFilter();
+    }
+
+    function filterTable() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const date = document.getElementById('dateFilter').value;
+        const table = document.getElementById('table-' + currentTab);
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr:not(.empty-row)');
+        rows.forEach(row => {
+            const name = (row.getAttribute('data-name') || '').toLowerCase();
+            const rowDate = row.getAttribute('data-date') || '';
+            const matchName = name.includes(search);
+            const matchDate = date === '' || rowDate === date;
+            row.style.display = matchName && matchDate ? '' : 'none';
+        });
+    }
+
+    function clearFilter() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('dateFilter').value = '';
+        filterTable();
+    }
+
+    const sortState = {};
+    function sortTable(tableId, colIndex) {
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr:not(.empty-row)'));
+        const key = tableId + '-' + colIndex;
+        sortState[key] = !sortState[key];
+        const asc = sortState[key];
+        rows.sort((a, b) => {
+            const aVal = a.cells[colIndex]?.textContent.trim() || '';
+            const bVal = b.cells[colIndex]?.textContent.trim() || '';
+            return asc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('scrollPos', window.scrollY);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        switchTab(activeTab);
+        const scrollPos = sessionStorage.getItem('scrollPos');
+        if (scrollPos) {
+            window.scrollTo(0, parseInt(scrollPos));
+            sessionStorage.removeItem('scrollPos');
+        }
+    });
+
+    const closedSelect = document.getElementById('closedSelect');
+    const timeFields = document.querySelectorAll('.time-field');
+
+    function toggleTimeFields() {
+        timeFields.forEach(f => {
+            f.style.display = closedSelect.value === 'true' ? 'none' : 'block';
+        });
+    }
+
+    closedSelect.addEventListener('change', toggleTimeFields);
+    toggleTimeFields();
+
+    function validateForm() {
+        const closed = document.getElementById('closedSelect').value;
+        const openTime = document.querySelector('input[name="openTime"]').value;
+        const closeTime = document.querySelector('input[name="closeTime"]').value;
+
+        if (closed === 'false' && (!openTime || !closeTime)) {
+            alert('Bitte Öffnungs- und Schliessungszeit angeben wenn das Restaurant geöffnet ist.');
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

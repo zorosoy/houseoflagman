@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Über uns')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('ueber-uns')}"></header>
+
+<main>
+    <section class="about">
+        <div class="about__left">
+            <div class="about__image-wrapper">
+                <img src="/images/restaurant.jpg" alt="Restaurant Innenraum">
+                <div class="about__badge">Tradition der Gastfreundschaft</div>
+            </div>
+        </div>
+        <div class="about__content">
+            <h1>Eine Reise der Aromen</h1>
+            <p>House of Lagman ist mehr als ein Restaurant. Es ist unsere Herkunft. Als uigurische Gastgeber bringen wir die Kunst der handgezogenen Nudeln dorthin zurück, wo sie hingehört: auf den Tisch, mit Zeit, Hingabe und Respekt vor der Tradition.</p>
+            <p>Jeder Strang wird von Hand gezogen. Kein Schnitt, keine Abkürzung. Nur Technik, Geduld und Erfahrung. Regionale Zutaten treffen auf Gewürze entlang der Seidenstrasse. Kraftvoll, aromatisch, unverfälscht.</p>
+            <p>Nehmen Sie Platz. Erleben Sie eine Küche, die nicht neu erfunden wurde, sondern über Generationen gewachsen ist.</p>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

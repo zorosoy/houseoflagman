@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Kontakt')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('kontakt')}"></header>
+
+<main>
+    <section class="kontakt">
+        <h1>Mehr Über uns</h1>
+        <p>Erleben Sie das Erbe handgemachter Lagman. Wir freuen uns, Sie bei uns begrüssen zu dürfen.</p>
+
+        <div class="kontakt__grid">
+            <div class="kontakt__left">
+                <div th:replace="~{fragments/layout :: oeffnungszeiten}"></div>
+                <div th:replace="~{fragments/layout :: standort}"></div>
+            </div>
+            <div class="kontakt__right">
+                <div th:replace="~{fragments/layout :: kontaktkarte}"></div>
+                <div th:replace="~{fragments/layout :: sonderoeffnungszeiten}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

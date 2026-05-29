@@ -1,0 +1,307 @@
+.admin-body {
+    background-color: #f5f5f5;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* LOGIN */
+.admin-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.admin-login__box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.admin-login__box h1 {
+    font-family: 'Noto Serif', serif;
+    font-weight: 900;
+    color: #004F5D;
+    margin-bottom: 0.3rem;
+}
+
+.admin-login__box p {
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* NAVBAR */
+.admin-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #004F5D;
+    color: white;
+}
+
+.admin-nav__logo {
+    font-family: 'Noto Serif', serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: white;
+}
+
+/* CONTENT */
+.admin-wrapper {
+    min-height: 100vh;
+}
+
+.admin-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* SECTIONS */
+.admin-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.admin-section h2 {
+    font-family: 'Noto Serif', serif;
+    font-weight: 900;
+    color: #004F5D;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.admin-section h3 {
+    font-family: var(--font-serif), serif;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+/* TABLE */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: #f5f5f5;
+    font-weight: 700;
+    color: var(--color-text);
+    border-bottom: 2px solid #ddd;
+}
+
+.admin-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #eee;
+    color: var(--color-text-light);
+}
+
+.admin-table tr:hover td {
+    background: #fafafa;
+}
+
+/* BUTTONS */
+.admin-btn {
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.admin-btn--delete {
+    background-color: #FFB595;
+    color: #7E2F00;
+}
+
+.admin-btn--delete:hover {
+    background-color: #ff9575;
+}
+
+/* FORM */
+.admin-form {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.admin-form__row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.admin-form__row .form-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+
+.admin-section {
+    overflow: visible;
+}
+
+.admin-content {
+    overflow: visible;
+}
+
+/* TABS */
+.admin-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0;
+}
+
+.admin-tab {
+    background: none;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #555;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.admin-tab.active {
+    color: #004F5D;
+    font-weight: 700;
+    border-bottom: 2px solid #004F5D;
+}
+
+.admin-tab__date {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #999;
+}
+
+/* FILTER */
+.admin-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.admin-filter input {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--color-body);
+}
+
+/* STATUS */
+.status-arrived { color: green; font-weight: 700; }
+.status-noshow { color: red; font-weight: 700; }
+.status-pending { color: gray; }
+
+/* SORTIERUNG */
+.admin-table th[onclick] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.admin-table th[onclick]:hover {
+    color: #004F5D;
+}
+
+/* STATUS SELECT */
+.admin-status-select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: var(--color-body);
+}
+
+tr.row-arrived td {
+    background-color: rgba(0, 200, 100, 0.1);
+}
+
+tr.row-noshow td {
+    background-color: rgba(255, 80, 80, 0.1);
+}
+
+/* Scrollbare Tabellen */
+.admin-section .admin-table-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+/* Sticky Header beim Scrollen */
+.admin-table-wrapper .admin-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f5f5f5;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .admin-content {
+        padding: 1rem;
+    }
+
+    .admin-form__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    #date-from { grid-column: 1; }
+    #date-to { grid-column: 2; }
+
+    .admin-form__row .form-group:nth-child(3),
+    .admin-form__row .form-group:nth-child(4),
+    .admin-form__row .btn {
+        grid-column: 1 / -1;
+    }
+
+    /* Öffnungs- und Schliessungszeit nebeneinander */
+    .admin-form__row .time-field:nth-of-type(1) { grid-column: 1; }
+    .admin-form__row .time-field:nth-of-type(2) { grid-column: 2; }
+
+    .admin-table {
+        font-size: 0.8rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 0.4rem 0.5rem;
+    }
+
+    .admin-nav {
+        padding: 0.8rem 1rem;
+    }
+
+    .admin-nav__logo {
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reservieren')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('')}"></header>
+
+<main>
+    <section class="reservieren">
+        <h1>Tisch reservieren<br>und Tradition erleben.</h1>
+        <p>Willkommen bei House of Lagman, wo uigurische Tradition lebendig wird. Eine Reservation ist nicht nötig, verkürzt jedoch Wartezeiten vor Ort und sorgt für ein entspanntes Erlebnis.</p>
+
+        <div class="reservieren__grid">
+            <div class="reservieren__form">
+                <h2>Reservationsdetails</h2>
+
+                <div th:if="${param.success}" class="alert alert--success">
+                    Ihre Reservation für
+                    <strong th:text="${#temporals.format(#temporals.createDate(param.date[0]), 'dd.MM.yyyy')}"></strong>,
+                    <strong th:text="${param.time[0]} + ' Uhr'"></strong>
+                    wurde erfolgreich abgeschickt!
+                    Sie erhalten in Kürze eine E-Mail-Bestätigung. Wir freuen uns auf Sie.
+                </div>
+                <div th:if="${capacityError}" class="alert alert--info" th:text="${capacityError}" id="capacityErrorDiv"></div>
+                <form th:action="@{/reservieren}" th:object="${reservation}" method="post">
+                    <span id="savedDate" th:text="${reservation.date}" style="display:none"></span>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="persons"><img src="/images/icons/person.svg" class="label-icon"> Anzahl Personen</label>
+                            <select th:field="*{persons}" id="persons">
+                                <option value="1">1 Person</option>
+                                <option value="2">2 Personen</option>
+                                <option value="3">3 Personen</option>
+                                <option value="4">4 Personen</option>
+                                <option value="5">5 Personen</option>
+                                <option value="6">6 Personen</option>
+                                <option value="7">7 Personen</option>
+                                <option value="8">8 Personen</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><img src="/images/icons/kalender.svg" class="label-icon"> Datum</label>
+                            <input type="date" th:field="*{date}" id="datePicker" onchange="loadSlots()" required>
+                        </div>
+                        <div class="form-group">
+                            <label><img src="/images/icons/uhr-schwarz.svg" class="label-icon"> Bevorzugte Zeit</label>
+                            <input type="hidden" th:field="*{time}" id="selectedTime">
+                            <button type="button" class="time-select-btn" id="timeBtn"
+                                    onclick="openModal()" disabled>
+                                Zeit wählen
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert--info">
+                        Für Gruppen ab 9 Personen bitten wir Sie, uns direkt anzurufen oder eine E-Mail zu senden, damit wir Ihre Reservierung sichern können.
+                    </div>
+
+                    <div class="alert alert--note">
+                        Ihre Reservation gilt für <strong>2 Stunden</strong>. Bei Nichterscheinen wird der Tisch nach <strong>15 Minuten</strong> freigegeben. Für Stornierungen oder Änderungen bitten wir Sie, uns <strong>telefonisch</strong> zu kontaktieren.
+                    </div>
+
+                    <div id="kontaktInfo" style="display:none">
+                        <h3>Kontakt Informationen</h3>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" th:field="*{name}" placeholder="Dein Name" required>
+                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+                        </div>
+                        <div class="form-row two-col">
+                            <div class="form-group">
+                                <label>E-Mail Adresse</label>
+                                <input type="email" th:field="*{email}" placeholder="email@beispiel.com" required>
+                                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Nummer</label>
+                                <input type="tel" th:field="*{phone}" placeholder="+41 79 123 45 67" required>
+                                <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn--primary">Reservation abschicken</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="reservieren__sidebar">
+                <div th:replace="~{fragments/layout :: oeffnungszeiten}"></div>
+                <div th:replace="~{fragments/layout :: sonderoeffnungszeiten}"></div>
+                <div th:replace="~{fragments/layout :: kontaktkarte}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- TIME MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal" id="timeModal">
+    <div class="modal__header">
+        <h3>Zeit wählen</h3>
+        <button class="modal__close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal__closed-msg" id="closedMsg" style="display:none">
+        <p>Das Restaurant ist an diesem Tag geschlossen.</p>
+    </div>
+    <div class="time-picker" id="timePicker"></div>
+</div>
+
+<script>
+    function checkFormComplete() {
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('selectedTime').value;
+        const kontaktInfo = document.getElementById('kontaktInfo');
+
+        if (date && time) {
+            kontaktInfo.style.display = 'block';
+        } else {
+            kontaktInfo.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const hasErrors = document.querySelector('.error') !== null;
+        const hasCapacityError = document.querySelector('#capacityErrorDiv') !== null;
+
+        if (hasErrors || hasCapacityError) {
+            document.getElementById('kontaktInfo').style.display = 'block';
+
+            // Datum aus savedDate span wiederherstellen
+            const savedDate = document.getElementById('savedDate').textContent.trim();
+            if (savedDate && savedDate !== 'null') {
+                document.getElementById('datePicker').value = savedDate;
+                document.getElementById('timeBtn').disabled = false;
+            }
+
+            // Zeit wiederherstellen
+            const selectedTime = document.getElementById('selectedTime').value;
+            if (selectedTime) {
+                document.getElementById('timeBtn').textContent = selectedTime;
+                document.getElementById('timeBtn').disabled = false;
+            }
+
+            // Zum Fehler scrollen
+            const firstError = document.querySelector('.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+
+    function loadSlots() {
+        const date = document.getElementById('datePicker').value;
+        const btn = document.getElementById('timeBtn');
+        if (!date) return;
+        btn.disabled = false;
+        btn.textContent = 'Zeit wählen';
+        document.getElementById('selectedTime').value = '';
+        checkFormComplete();
+    }
+
+    function openModal() {
+        const date = document.getElementById('datePicker').value;
+        const persons = document.getElementById('persons').value;
+        if (!date) return;
+
+        fetch('/reservieren/slots?date=' + date + '&persons=' + persons)
+            .then(r => r.json())
+            .then(data => {
+                const picker = document.getElementById('timePicker');
+                const closedMsg = document.getElementById('closedMsg');
+                picker.innerHTML = '';
+
+                if (data.closed) {
+                    closedMsg.style.display = 'block';
+                    picker.style.display = 'none';
+                } else {
+                    closedMsg.style.display = 'none';
+                    picker.style.display = 'grid';
+                    data.slots.forEach(slot => {
+                        const el = document.createElement('div');
+                        el.className = 'time-slot' + (slot.available ? '' : ' time-slot--full');
+                        el.innerHTML = '<span class="time-slot__time">' + slot.time + '</span>' +
+                            '<span class="time-slot__remaining">' + slot.remaining + ' frei</span>';
+                        if (slot.available) {
+                            el.onclick = () => selectTime(slot.time, el);
+                        }
+                        picker.appendChild(el);
+                    });
+                }
+
+                document.getElementById('modalOverlay').style.display = 'block';
+                document.getElementById('timeModal').style.display = 'flex';
+            });
+    }
+
+    function selectTime(time, el) {
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('time-slot--selected'));
+        el.classList.add('time-slot--selected');
+        document.getElementById('selectedTime').value = time;
+        document.getElementById('timeBtn').textContent = time;
+        setTimeout(() => {
+            closeModal();
+            checkFormComplete();
+        }, 300);
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('timeModal').style.display = 'none';
+    }
+</script>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

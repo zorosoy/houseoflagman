@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | House of Lagman'">House of Lagman</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/png" th:href="@{/favicon.png}">
+</head>
+
+<header th:fragment="header(activePage)">
+    <nav class="navbar">
+        <a href="/" class="navbar__logo">
+            <img src="/images/logo.png" alt="House of Lagman" style="height: 40px;">
+        </a>
+        <button class="navbar__hamburger" id="hamburger">☰</button>
+        <ul class="navbar__links" id="navLinks">
+            <li><a href="/" th:classappend="${activePage == 'start'} ? 'active'">Start</a></li>
+            <li><a href="/ueber-uns" th:classappend="${activePage == 'ueber-uns'} ? 'active'">Über uns</a></li>
+            <li><a href="/menu" th:classappend="${activePage == 'menu'} ? 'active'">Menü</a></li>
+            <li><a href="/kontakt" th:classappend="${activePage == 'kontakt'} ? 'active'">Kontakt</a></li>
+        </ul>
+        <a href="/reservieren" class="btn btn--primary navbar__reserve">Tisch reservieren</a>
+    </nav>
+    <script th:src="@{/js/navbar.js}"></script>
+</header>
+
+<footer th:fragment="footer">
+    <div class="footer__left">
+        <span class="footer__logo">House of Lagman</span>
+        <span>Aargauerstrasse 2, 5610 Wohlen AG</span>
+    </div>
+    <div class="footer__center">
+        <a href="https://instagram.com/house_of_lagman" target="_blank">Instagram</a>
+        <a href="https://www.tiktok.com/@house_of_lagman" target="_blank">TikTok</a>
+        <a href="/impressum">Impressum</a>
+        <a href="/agb">AGB</a>
+    </div>
+    <div class="footer__right">
+        <span>©2026 by <a href="https://nisoya99.com" target="_blank" class="footer__credit">nisoya99</a></span>
+    </div>
+</footer>
+
+<div th:fragment="oeffnungszeiten">
+    <div class="card card--teal">
+        <h2>
+            <img src="/images/icons/uhr-weiss.svg" class="card-icon">
+            Öffnungszeiten
+        </h2>
+        <div class="hours">
+            <span>Di – Do</span><span class="hours__time">11:30 – 21:00</span>
+            <span>Fr – So</span><span class="hours__time">11:30 – 22:00</span>
+            <span>Montag</span><span class="closed">geschlossen</span>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="sonderoeffnungszeiten">
+    <div class="card card--brown">
+        <h2>
+            <img src="/images/icons/uhr-weiss.svg" class="card-icon">
+            Sonderöffnungszeiten
+        </h2>
+        <div th:if="${#lists.isEmpty(specialHours)}" style="font-size:0.9rem; opacity:0.8; padding-top:1rem;">
+            Keine Sonderöffnungszeiten vorhanden.
+        </div>
+        <div class="hours" th:if="${!#lists.isEmpty(specialHours)}">
+            <th:block th:each="sh : ${specialHours}">
+                <span>
+                    <span th:if="${sh.dateTo != null}">
+                        <span th:if="${sh.date.month == sh.dateTo.month and sh.date.year == sh.dateTo.year}"
+                              th:text="${#temporals.format(sh.date, 'dd.')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                        <span th:if="${sh.date.month != sh.dateTo.month and sh.date.year == sh.dateTo.year}"
+                              th:text="${#temporals.format(sh.date, 'dd.MM.')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                        <span th:if="${sh.date.year != sh.dateTo.year}"
+                              th:text="${#temporals.format(sh.date, 'dd.MM.yyyy')} + '–' + ${#temporals.format(sh.dateTo, 'dd.MM.yyyy')}"></span>
+                    </span>
+                    <span th:if="${sh.dateTo == null}"
+                          th:text="${#temporals.format(sh.date, 'dd.MM.yyyy')}"></span>
+                </span>
+                <span th:text="${sh.description}"></span>
+                <span th:if="${sh.closed}" class="closed">geschlossen</span>
+                <span th:if="${!sh.closed}" class="hours__time"
+                      th:text="${#temporals.format(sh.openTime, 'HH:mm')} + ' – ' + ${#temporals.format(sh.closeTime, 'HH:mm')}"></span>
+            </th:block>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="kontaktkarte">
+    <div class="card card--icon">
+        <div class="card__icon-badge">
+            <img src="/images/icons/Telefon.svg" alt="Telefon">
+        </div>
+        <div>
+            <h3>Kontakt</h3>
+            <p>+41 77 267 21 51<br>kontakt@houseoflagman.ch</p>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="standort">
+    <div class="card card--icon">
+        <div class="card__icon-badge">
+            <img src="/images/icons/standort.svg" alt="Standort">
+        </div>
+        <div>
+            <h3>Standort</h3>
+            <p>Aargauerstrasse 2<br>5610 Wohlen<br>Schweiz</p>
+        </div>
+    </div>
+</div>
+
+</html>

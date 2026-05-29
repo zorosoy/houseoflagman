@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Start')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('start')}"></header>
+
+<main>
+    <section class="hero">
+        <div class="hero__content">
+            <span class="hero__label">AUTHENTISCHES ERBE</span>
+            <h1 class="hero__title">Kunst in jedem Faden.</h1>
+            <p class="hero__text">Erleben Sie die zeitlose Kunst der handgezogenen uigurischen Nudeln, bei der jede Schüssel eine Geschichte von Tradition, Herzlichkeit und kulinarischer Meisterschaft erzählt.</p>
+            <a href="/menu" class="btn btn--hero">Menü entdecken</a>
+        </div>
+        <div class="hero__badge">
+            <img src="/images/icons/badge.svg" alt="Badge" class="hero__badge-icon">
+            <div>
+                <span class="hero__badge-title">Echte Handwerkskunst</span>
+                <span class="hero__badge-text">handgezogene Nudeln nach uigurischer Tradition.</span>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
